@@ -9,5 +9,6 @@ bin/baysor
 .vscode
 .history
 
-examples/*/data*
-examples/*/output_*
+examples/*
+#examples/*/data*
+#examples/*/output_*
