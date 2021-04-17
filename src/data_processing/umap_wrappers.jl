@@ -23,7 +23,7 @@ function fit(::Type{UmapFit}, x::Array{Float64, 2}, pca::MultivariateStats.PCA; 
     return UmapFit(embedding, nn_tree, pca, nn_interpolate)
 end
 
-fit(::Type{UmapFit}, x::Array{Float64, 2}; n_pcs::Int=15, kwargs...)::UmapFit =
+fit(::Type{UmapFit}, x::Array{Float64, 2}; n_pcs::Int=3, kwargs...)::UmapFit =
     fit(UmapFit, x, fit(MultivariateStats.PCA, x, maxoutdim=n_pcs); kwargs...)
 
 function transform(transformation::UmapFit, x::Array{Float64, 2}; dist_offset::Float64=1e-10)::Array{Float64, 2}
