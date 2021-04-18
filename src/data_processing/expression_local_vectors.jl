@@ -48,7 +48,7 @@ truncate_pca(pca::MultivariateStats.PCA, outdim::Int) =
     MultivariateStats.PCA(pca.mean, pca.proj[:, 1:outdim], pca.prinvars[1:outdim], pca.tvar)
 
 function gene_composition_transformation(count_matrix::Matrix{Float64}, confidence::Vector{Float64}=ones(size(count_matrix, 2));
-        sample_size::Int=10000, seed::Int=42, method::Symbol=:umap, return_all::Bool=false, n_pcs::Int=3, out_dim::Int=3, kwargs...)
+        sample_size::Int=10000, seed::Int=42, method::Symbol=:umap, return_all::Bool=false, n_pcs::Int=3, out_dim::Int=2, kwargs...)
     sample_size = min(sample_size, size(count_matrix, 2))
     Random.seed!(seed)
 
@@ -57,8 +57,12 @@ function gene_composition_transformation(count_matrix::Matrix{Float64}, confiden
         method = :pca
     end
 
-    pca = fit(MultivariateStats.PCA, count_matrix, maxoutdim=n_pcs)
-    pca_res = transform(truncate_pca(pca, 2), count_matrix);
+    # debug, try muting PCA: out dataset only has
+
+    #=
+    # pca = fit(MultivariateStats.PCA, count_matrix, maxoutdim=n_pcs)
+    # pca_res = transform(pca, count_matrix)
+    # pca_res = transform(truncate_pca(pca, out_dim), count_matrix);
     sample_ids = select_ids_uniformly(pca_res', confidence, n=sample_size)
 
     count_matrix_sample = count_matrix[:,sample_ids]
@@ -67,7 +71,7 @@ function gene_composition_transformation(count_matrix::Matrix{Float64}, confiden
     if method == :umap
         emb = fit(UmapFit, count_matrix_sample, pca; n_components=out_dim, kwargs...);
     elseif method == :pca
-        emb = truncate_pca(pca, 3);
+        emb = truncate_pca(pca, out_dim);
     else
         error("Unknown method: '$method'")
     end
@@ -75,6 +79,8 @@ function gene_composition_transformation(count_matrix::Matrix{Float64}, confiden
     if return_all
         return (emb, sample_ids, pca)
     end
+    =#
+    emb = count_matrix[:, 1:min(out_dim, size(count_matrix, 2))]
 
     return emb
 end
